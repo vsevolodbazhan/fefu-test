@@ -83,6 +83,7 @@ class Document(models.Model):
     pubmed_id = models.CharField(max_length=200)
     title = models.CharField(max_length=255)
     subtype = models.CharField(max_length=200)
+    # subtype_description = models.CharField(max_length=200)
     creator = models.ForeignKey(Author, on_delete=models.CASCADE)
     author_count = models.IntegerField(default=0)
     cover_date = models.DateField()
