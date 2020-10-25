@@ -1,4 +1,4 @@
-import csv
+from collections import namedtuple
 from datetime import date, timedelta
 
 from .models import Document
@@ -6,37 +6,37 @@ from .models import Document
 MIN_YEAR_WEEK = 1
 MAX_YEAR_WEEK = 52
 
+PublicationRecord = namedtuple("PublicationRecord", ["year", "week", "publications"])
+PublicationRecord.__doc__ = (
+    "Запись о количестве публикаций в определенную неделю определенного года."
+)
 
-def export_publication_history(
-    filename,
+
+def get_publication_history(
     start_year=1965,
     end_year=2020,
-    header=["Year", "Week", "Publications"],
-    delimiter=",",
 ):
-    """Выгрузить данные о еженедельном приросте публикаций
-    за заданный исторический период в .csv файл.
+    """Получить данные о еженедельном приросте публикаций
+    за заданный исторический период.
 
     Arguments:
-        filename (str): Название файла без расширения.
         start_year (str): Год начала исторического периода.
         end_year (str): Год окончания исторического периода.
-        header (Iterable): Заголовок файла.
-        delimiter (str): Разделитель между значениями.
-        Для корректного экспорта в Excel используйте ";".
-    """
-    with open(f"{filename}.csv", "w") as file:
-        writer = csv.writer(file, delimiter=delimiter)
-        writer.writerow(header)
 
-        publication_count = 0
-        for year in range(start_year, end_year + 1):
-            for week in range(MIN_YEAR_WEEK, MAX_YEAR_WEEK + 1):
-                start_date, end_date = get_date_range(year, week)
-                publication_count += get_publication_count_within_range(
-                    start_date, end_date
-                )
-                writer.writerow((year, week, publication_count))
+    Returns:
+        list[PublicationRecord]: Список исторических записей.
+    """
+    records = []
+    publication_count = 0
+    for year in range(start_year, end_year + 1):
+        for week in range(MIN_YEAR_WEEK, MAX_YEAR_WEEK + 1):
+            start_date, end_date = get_date_range(year, week)
+            publication_count += get_publication_count_within_range(
+                start_date, end_date
+            )
+            record = PublicationRecord(year, week, publication_count)
+            records.append(record)
+    return records
 
 
 def get_publication_count_within_range(start_date, end_date):
