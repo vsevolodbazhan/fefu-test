@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from .models import Document
 
 MIN_YEAR_WEEK = 1
-MAX_YEAR_WEEK = 52
+MAX_YEAR_WEEK = 53
 
 PublicationRecord = namedtuple("PublicationRecord", ["year", "week", "publications"])
 PublicationRecord.__doc__ = (
@@ -30,10 +30,16 @@ def get_publication_history(
     publication_count = 0
     for year in range(start_year, end_year + 1):
         for week in range(MIN_YEAR_WEEK, MAX_YEAR_WEEK + 1):
-            start_date, end_date = get_date_range(year, week)
+            try:
+                start_date, end_date = get_date_range(year, week)
+            except ValueError:
+                # В этом году нет 53 недели.
+                continue
+
             publication_count += get_publication_count_within_range(
                 start_date, end_date
             )
+            print(start_date, end_date, week)
             record = PublicationRecord(year, week, publication_count)
             records.append(record)
     return records
